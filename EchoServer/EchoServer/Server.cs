@@ -8,48 +8,55 @@ namespace EchoServer
 {
     public class Server
     {
-        public static void ServerStart()
+        private TcpListener serverSocket;
+        private TcpClient connectionSocket;
+        private StreamReader sr;
+        private StreamWriter sw;
+        private Stream ns;
+
+        public void ServerStart()
         {
-            TcpListener serverSocket = new TcpListener(8888);
+            serverSocket = new TcpListener(8888);
             serverSocket.Start();
-            using (TcpClient connectionSocket = serverSocket.AcceptTcpClient())
+            connectionSocket = serverSocket.AcceptTcpClient(); 
+            Console.WriteLine("server activated");
+            ns = connectionSocket.GetStream();
+            sr = new StreamReader(ns);
+            sw = new StreamWriter(ns);
+            sw.AutoFlush = true; // enable automatic flushing
+            Run();
+            
+
+
+
+        }
+
+        private void Run()
+        {
+            while (true)
             {
-                Console.WriteLine("server activated");
-                Stream ns = connectionSocket.GetStream();
-                StreamReader sr = new StreamReader(ns);
-
-                StreamWriter sw = new StreamWriter(ns);
-
-                sw.AutoFlush = true; // enable automatic flushing 
-
-
-
-                while (true)
+                string message = sr.ReadLine();
+                Console.WriteLine("received message: " + message);
+                if (message != null)
                 {
-                    string message = sr.ReadLine();
-
-                    Console.WriteLine("received message: " + message);
-                    if (message != null)
-                    {
-                        sw.WriteLine(message.ToUpper());
-                    }
-
-                    if (message == "break")
-                    {
-                        break;
-                    }
+                    sw.WriteLine(message.ToUpper());
                 }
-
-                ns.Close();
-                Console.WriteLine("net stream closed");
-                connectionSocket.Close();
-                Console.WriteLine("connection socket closed");
-                serverSocket.Stop();
-                Console.WriteLine("server stopped");
-
-
-
+                if (message == "break")
+                {
+                    break;
+                }
             }
+            Stop();
+        }
+
+        private void Stop()
+        {
+            ns.Close();
+            Console.WriteLine("net stream closed");
+            connectionSocket.Close();
+            Console.WriteLine("connection socket closed");
+            serverSocket.Stop();
+            Console.WriteLine("server stopped");
         }
     }
 }
