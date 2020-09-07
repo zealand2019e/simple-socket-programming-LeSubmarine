@@ -15,7 +15,7 @@ namespace EchoClient
 
         public EchoClient()
         {
-            _clientSocket = new TcpClient("192.168.24.232",8888);
+            _clientSocket = new TcpClient("localhost",8888);
 
 
 
@@ -28,11 +28,16 @@ namespace EchoClient
             _sw.AutoFlush = true; // enable automatic flushing 
         }
 
-        public string WriteRead(string message)
+        public void Write(string message)
         {
             _sw.WriteLine(message);
-            return _sr.ReadLine();
 
+        }
+
+        public string Read()
+        {
+            string a = _sr.ReadLine();
+            return a; //_sr.ReadToEnd();
         }
     }
 }

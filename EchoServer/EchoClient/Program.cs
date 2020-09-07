@@ -12,13 +12,27 @@ namespace EchoClient
 
             
             EchoClient client = new EchoClient();
-
+            string message = "Hello";
+            client.Write(message);
             while (true)
             {
 
-                string message = Console.ReadLine();
-                message = client.WriteRead(message);
+                message = client.Read();
+                while (true)
+                {
+                    if (message == "" || message == null)
+                    {
+                        message = client.Read();
+                        
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
                 Console.WriteLine(message);
+                message = Console.ReadLine();
+                client.Write(message);
             }
         }
     }

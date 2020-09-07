@@ -33,13 +33,45 @@ namespace EchoServer
 
         private void Run()
         {
+            List<int> items = new List<int>();
+            List<double> price = new List<double>();
+            List<string> posAnswers = new List<string>() { "banana", "lemon", "apple", "milk", "meat" };
+            string question = "Which item would you like?";
+            question += " (";
+            for (int i = 0; i < posAnswers.Count; i++)
+            {
+                question += posAnswers[i] + ", ";
+            }
+            question = question.Remove(question.Length - 1);
+            question += ")";
+
             while (true)
             {
                 string message = sr.ReadLine();
                 Console.WriteLine("received message: " + message);
                 if (message != null)
                 {
-                    sw.WriteLine(message.ToUpper());
+                    while (true)
+                    {
+                        sw.WriteLine($"Welcome to the shopping cart. {question}");
+
+                        string answer = sr.ReadLine().ToLower();
+                        if (answer != null)
+                        {
+                            for (int i = 0; i < posAnswers.Count; i++)
+                            {
+                                if (answer == posAnswers[i])
+                                {
+                                    price.Add(OneLineCalc.Program.ItemTypePrice(answer));
+                                    break;
+                                }
+                            } 
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
                 }
                 if (message == "break")
                 {
