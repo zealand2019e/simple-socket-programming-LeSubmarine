@@ -6,19 +6,18 @@ using System.Text;
 
 namespace EchoClient
 {
-    public class EchoClient
+    public class EchoClient : IDisposable
     {
         private TcpClient _clientSocket;
         private Stream _ns;
         private StreamReader _sr;
         private StreamWriter _sw;
 
-        public EchoClient()
-        {
+        public EchoClient() 
+        { 
             _clientSocket = new TcpClient("localhost",8888);
 
-
-
+            
             _ns = _clientSocket.GetStream(); //provides a Stream 
 
             _sr = new StreamReader(_ns);
@@ -38,6 +37,14 @@ namespace EchoClient
         {
             string a = _sr.ReadLine();
             return a; //_sr.ReadToEnd();
+        }
+
+        public void Dispose()
+        {
+            _clientSocket?.Dispose();
+            _ns?.Dispose();
+            _sr?.Dispose();
+            _sw?.Dispose();
         }
     }
 }
