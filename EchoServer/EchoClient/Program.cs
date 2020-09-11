@@ -10,29 +10,31 @@ namespace EchoClient
         {
             Console.ReadLine();
 
-            
-            EchoClient client = new EchoClient();
-            string message = "Hello";
-            client.Write(message);
-            while (true)
-            {
 
-                message = client.Read();
+            using (EchoClient client = new EchoClient())
+            {
+                string message = "Hello";
+                client.Write(message);
+                string received;
                 while (true)
                 {
-                    if (message == "" || message == null)
+
+                    received = client.Read();
+                    DateTime time = DateTime.Now.AddSeconds(5);
+                    while (string.IsNullOrWhiteSpace(message))
                     {
-                        message = client.Read();
-                        
+                        received = client.Read();
+                        if (DateTime.Now > time)
+                        {
+                            Console.WriteLine("Server not responding.\nSending new message.");
+                            client.Write(message);
+                        }
                     }
-                    else
-                    {
-                        break;
-                    }
+
+                    Console.WriteLine(received);
+                    message = Console.ReadLine();
+                    client.Write(message);
                 }
-                Console.WriteLine(message);
-                message = Console.ReadLine();
-                client.Write(message);
             }
         }
     }

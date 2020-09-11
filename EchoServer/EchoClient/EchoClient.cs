@@ -35,8 +35,21 @@ namespace EchoClient
 
         public string Read()
         {
-            string a = _sr.ReadLine();
-            return a; //_sr.ReadToEnd();
+            //string a;
+            //string returnString = "";
+            //while (true)
+            //{
+            //    a = _sr.ReadLine();
+            //    if (!string.IsNullOrEmpty(a) && !string.IsNullOrWhiteSpace(a))
+            //    {
+            //        returnString += a;
+            //    }
+            //    else
+            //    {
+            //        break;
+            //    }
+            //}
+            return _sr.ReadLine();//returnString; //_sr.ReadToEnd();
         }
 
         public void Dispose()

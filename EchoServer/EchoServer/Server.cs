@@ -3,92 +3,76 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace EchoServer
 {
     public class Server
     {
-        private TcpListener serverSocket;
-        private TcpClient connectionSocket;
-        private StreamReader sr;
-        private StreamWriter sw;
-        private Stream ns;
-
+        private static int totaltConnectionNo = 0;
         public void ServerStart()
         {
-            serverSocket = new TcpListener(8888);
+            int clientNo = 0;
+            TcpClient connectionSocket;
+            Thread.CurrentThread.Name = "Main";
+            TcpListener serverSocket = new TcpListener(8888);
             serverSocket.Start();
-            connectionSocket = serverSocket.AcceptTcpClient(); 
-            Console.WriteLine("server activated");
-            ns = connectionSocket.GetStream();
-            sr = new StreamReader(ns);
-            sw = new StreamWriter(ns);
-            sw.AutoFlush = true; // enable automatic flushing
-            Run();
-            
-
-
-
-        }
-
-        private void Run()
-        {
-            List<int> items = new List<int>();
-            List<double> price = new List<double>();
-            List<string> posAnswers = new List<string>() { "banana", "lemon", "apple", "milk", "meat" };
-            string question = "Which item would you like?";
-            question += " (";
-            for (int i = 0; i < posAnswers.Count; i++)
-            {
-                question += posAnswers[i] + ", ";
-            }
-            question = question.Remove(question.Length - 1);
-            question += ")";
-
+            TaskFactory taskFactory = new TaskFactory();
             while (true)
             {
-                string message = sr.ReadLine();
-                Console.WriteLine("received message: " + message);
-                if (message != null)
-                {
-                    while (true)
-                    {
-                        sw.WriteLine($"Welcome to the shopping cart. {question}");
+                connectionSocket = serverSocket.AcceptTcpClient();
+                Console.WriteLine("server activated");
+                clientNo++;
+                totaltConnectionNo++;
+                taskFactory.StartNew(() => DoClient(connectionSocket,clientNo));
+            }
 
-                        string answer = sr.ReadLine().ToLower();
-                        if (answer != null)
-                        {
-                            for (int i = 0; i < posAnswers.Count; i++)
-                            {
-                                if (answer == posAnswers[i])
-                                {
-                                    price.Add(OneLineCalc.Program.ItemTypePrice(answer));
-                                    break;
-                                }
-                            } 
-                        }
-                        else
+            connectionSocket.Close();
+            Console.WriteLine("connection socket closed");
+            serverSocket.Stop();
+            Console.WriteLine("server stopped");
+        }   
+
+        private void DoClient(TcpClient connection, int clientNo)
+        {
+            try
+            {
+                Stream ns = connection.GetStream();
+                StreamReader sr = new StreamReader(ns);
+                StreamWriter sw = new StreamWriter(ns);
+                sw.AutoFlush = true; // enable automatic flushing
+                int emptyMessages = 0;
+                while (true)
+                {
+                    string message = sr.ReadLine();
+                    if (!string.IsNullOrWhiteSpace(message) && message != "")
+                    {
+                        Console.WriteLine("received message: " + message);
+                        sw.WriteLine(message.ToUpper());
+                        emptyMessages = 0;
+                    }
+                    else
+                    {
+                        emptyMessages++;
+                        if (emptyMessages > 2)
                         {
                             break;
                         }
                     }
                 }
-                if (message == "break")
-                {
-                    break;
-                }
             }
-            Stop();
-        }
-
-        private void Stop()
-        {
-            ns.Close();
-            Console.WriteLine("net stream closed");
-            connectionSocket.Close();
-            Console.WriteLine("connection socket closed");
-            serverSocket.Stop();
-            Console.WriteLine("server stopped");
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                Console.WriteLine($"Connection ended with clientNo{clientNo}");
+                connection.Close();
+                Console.WriteLine("Net stream closed");
+                totaltConnectionNo--;
+            }
         }
     }
 }
