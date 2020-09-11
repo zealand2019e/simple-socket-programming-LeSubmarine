@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace EchoClient
 {
@@ -15,7 +16,7 @@ namespace EchoClient
 
         public EchoClient() 
         { 
-            _clientSocket = new TcpClient("localhost",8888);
+            _clientSocket = new TcpClient("192.168.24.183",7777);
 
             
             _ns = _clientSocket.GetStream(); //provides a Stream 
@@ -35,22 +36,28 @@ namespace EchoClient
 
         public string Read()
         {
-            //string a;
-            //string returnString = "";
-            //while (true)
-            //{
-            //    a = _sr.ReadLine();
-            //    if (!string.IsNullOrEmpty(a) && !string.IsNullOrWhiteSpace(a))
-            //    {
-            //        returnString += a;
-            //    }
-            //    else
-            //    {
-            //        break;
-            //    }
-            //}
-            return _sr.ReadLine();//returnString; //_sr.ReadToEnd();
+            return _sr.ReadLine();
         }
+
+        //public async Task<string> AsyncRead()
+        //{
+        //    TaskFactory taskFactory = new TaskFactory();
+        //    List<Task<string>> returnStrings = new List<Task<string>>();
+        //    string returnString;
+        //    while (true)
+        //    {
+        //        returnStrings.Add(taskFactory.StartNew(() => ReadLineAsync());
+        //    }
+
+        //    return returnString; //_sr.ReadToEnd();
+        //}
+
+        //private async Task<string> ReadLineAsync()
+        //{
+        //    string returnString;
+        //    returnString = _sr.ReadLine();
+        //    return returnString;
+        //}
 
         public void Dispose()
         {

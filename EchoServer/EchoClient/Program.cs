@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 
@@ -15,11 +16,12 @@ namespace EchoClient
             {
                 string message = "Hello";
                 client.Write(message);
+                //List<string> received = new List<string>();
                 string received;
                 while (true)
                 {
 
-                    received = client.Read();
+                    received = (client.Read());;
                     DateTime time = DateTime.Now.AddSeconds(5);
                     while (string.IsNullOrWhiteSpace(message))
                     {
