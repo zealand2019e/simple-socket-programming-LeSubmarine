@@ -36,7 +36,7 @@ namespace EchoClient
 
         public string Read()
         {
-            return _sr.ReadLine();
+                return _sr.ReadLine();
         }
 
         //public async Task<string> AsyncRead()

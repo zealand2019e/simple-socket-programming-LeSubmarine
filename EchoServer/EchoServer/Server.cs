@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Newtonsoft.Json;
 
 namespace EchoServer
 {
@@ -73,6 +74,12 @@ namespace EchoServer
                 Console.WriteLine("Net stream closed");
                 totaltConnectionNo--;
             }
+        }
+        public static Car ConverJsonToCar(string message)
+        {
+            if (message != null)
+                return (Car)JsonConvert.DeserializeObject(message, typeof(Car));
+            return null;
         }
     }
 }
